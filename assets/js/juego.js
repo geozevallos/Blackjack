@@ -50,3 +50,12 @@ const askForCard = () => {
 }
 
 askForCard();
+
+// This functions assign value for each card
+const cardValue = (card) => {
+    const value = card.substring(0,card.length-1);
+    return isNaN(value) ? ((value === 'A') ? 11 : 10) : value * 1
+}
+
+const value = cardValue(askForCard());
+console.log(value)
