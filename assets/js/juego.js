@@ -7,6 +7,7 @@
 
 // Reference to HTML elements
 const btnGet = document.querySelector('#btnGet');
+const btnStop = document.querySelector('#btnStop');
 const smallsHTML = document.querySelectorAll('small');
 const divPlayerCards = document.querySelector('.jugador-cartas')
 const divComputerCards = document.querySelector('.computadora-cartas')
@@ -63,7 +64,26 @@ const cardValue = (card) => {
     return isNaN(value) ? ((value === 'A') ? 11 : 10) : value * 1
 }
 
+// Computer
+const computerTurn = (minScore) => {
+    do {
+        const card = askForCard();
+    
+        scoreComputer = scoreComputer + cardValue(card);
+        smallsHTML[1].innerText = scoreComputer;
+    
+        // Generate card image
+        const cardImg = document.createElement('img')
+        cardImg.src = `assets/cartas/${card}.png`
+        cardImg.classList.add('carta');
+        divComputerCards.append(cardImg);
 
+        // player one lost, so don't care what card computer get
+        if(minScore > 21){
+            break;
+        }
+    } while ((scoreComputer < minScore) && (minScore <= 21));
+}
 
 // Events
 btnGet.addEventListener('click', () => {
@@ -81,7 +101,19 @@ btnGet.addEventListener('click', () => {
     if (scorePlayer1 > 21){
         console.warn('Perdise, papu :(!')
         btnGet.disabled = true;
+        btnStop.disabled = true;
+
+        computerTurn(scorePlayer1);
     } else if(scorePlayer1 === 21){
         console.warn('21, genial')
+        btnStop.disabled = true;
+        computerTurn(scorePlayer1);
     }
+})
+
+btnStop.addEventListener('click', () => {
+    btnGet.disabled = true;
+    btnStop.disabled = true;
+
+    computerTurn(scorePlayer1);
 })
