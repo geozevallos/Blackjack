@@ -5,10 +5,16 @@
  * 2S = Two of spades
  */
 
+// Reference to HTML elements
+const btnGet = document.querySelector('#btnGet');
+const smallsHTML = document.querySelectorAll('small');
 
 let deck = []
 const types = ['C', 'D', 'H', 'S']
 specials = ['A', 'J', 'Q', 'K']
+
+let scorePlayer1 = 0,
+    scoreComputer = 0; 
 
 // This function create a new deck
 const createDeck = () => {
@@ -44,12 +50,10 @@ const askForCard = () => {
 
     card = deck.pop()
     
-    console.log(card);
-    console.log(deck)
+
     return card
 }
 
-askForCard();
 
 // This functions assign value for each card
 const cardValue = (card) => {
@@ -57,5 +61,12 @@ const cardValue = (card) => {
     return isNaN(value) ? ((value === 'A') ? 11 : 10) : value * 1
 }
 
-const value = cardValue(askForCard());
-console.log(value)
+
+
+// Events
+btnGet.addEventListener('click', () => {
+    const card = askForCard();
+    
+    scorePlayer1 = scorePlayer1 + cardValue(card);
+    smallsHTML[0].innerText = scorePlayer1;
+})
