@@ -8,6 +8,8 @@
 // Reference to HTML elements
 const btnGet = document.querySelector('#btnGet');
 const smallsHTML = document.querySelectorAll('small');
+const divPlayerCards = document.querySelector('.jugador-cartas')
+const divComputerCards = document.querySelector('.computadora-cartas')
 
 let deck = []
 const types = ['C', 'D', 'H', 'S']
@@ -69,4 +71,17 @@ btnGet.addEventListener('click', () => {
     
     scorePlayer1 = scorePlayer1 + cardValue(card);
     smallsHTML[0].innerText = scorePlayer1;
+
+    // Generate card image
+    const cardImg = document.createElement('img')
+    cardImg.src = `assets/cartas/${card}.png`
+    cardImg.classList.add('carta');
+    divPlayerCards.append(cardImg);
+
+    if (scorePlayer1 > 21){
+        console.warn('Perdise, papu :(!')
+        btnGet.disabled = true;
+    } else if(scorePlayer1 === 21){
+        console.warn('21, genial')
+    }
 })
