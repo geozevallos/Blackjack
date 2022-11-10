@@ -8,6 +8,7 @@
 // Reference to HTML elements
 const btnGet = document.querySelector('#btnGet');
 const btnStop = document.querySelector('#btnStop');
+const btnNew = document.querySelector('#btnNew');
 const smallsHTML = document.querySelectorAll('small');
 const divPlayerCards = document.querySelector('.jugador-cartas')
 const divComputerCards = document.querySelector('.computadora-cartas')
@@ -83,6 +84,21 @@ const computerTurn = (minScore) => {
             break;
         }
     } while ((scoreComputer < minScore) && (minScore <= 21));
+
+    setTimeout(() => {
+        showWinner();    
+    }, 1000);
+}
+
+
+const showWinner = () => {
+    if ((scorePlayer1 <= 21) && ((scoreComputer < scorePlayer1) || (scoreComputer > 21))){
+        alert('You win!!')
+    } else if(scorePlayer1 === scoreComputer){
+        alert('No body wins')
+    } else{
+        alert('You lost :(')
+    }
 }
 
 // Events
@@ -116,4 +132,21 @@ btnStop.addEventListener('click', () => {
     btnStop.disabled = true;
 
     computerTurn(scorePlayer1);
+})
+
+btnNew.addEventListener('click', () => {
+    deck = [];
+    deck = createDeck();
+
+    btnGet.disabled = false;
+    btnStop.disabled = false;
+
+    scorePlayer1 = 0;
+    scoreComputer = 0;
+
+    smallsHTML[0].innerText = 0;
+    smallsHTML[1].innerText = 0;
+
+    divPlayerCards.innerHTML = '';
+    divComputerCards.innerHTML = '';
 })
