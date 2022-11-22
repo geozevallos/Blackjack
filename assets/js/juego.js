@@ -5,7 +5,7 @@
  * 2S = Two of spades
  */
 
-(() => {
+const miModulo = (() => {
   "use strict";
 
   // Reference to HTML elements
@@ -13,18 +13,40 @@
   const btnStop = document.querySelector("#btnStop");
   const btnNew = document.querySelector("#btnNew");
   const smallsHTML = document.querySelectorAll("small");
-  const divPlayerCards = document.querySelector(".jugador-cartas");
-  const divComputerCards = document.querySelector(".computadora-cartas");
+  const divPlayersCards = document.querySelectorAll(".divCards");
 
   let deck = [];
   const types = ["C", "D", "H", "S"],
-  specials = ["A", "J", "Q", "K"];
+    specials = ["A", "J", "Q", "K"];
 
-  let scorePlayer1 = 0,
-    scoreComputer = 0;
+  //   let scorePlayer1 = 0,
+  //     scoreComputer = 0;
+  let playersScore = [];
+
+  // This function start the game
+  const startGame = (players = 2) => {
+    deck = createDeck();
+    playersScore = [];
+
+    for (let i = 0; i < players; i++) {
+      playersScore.push(0);
+    }
+
+    smallsHTML.forEach((element) => {
+      element.innerText = 0;
+    });
+
+    divPlayersCards.forEach((element) => {
+      element.innerHTML = "";
+    });
+
+    btnGet.disabled = false;
+    btnStop.disabled = false;
+  };
 
   // This function create a new deck
   const createDeck = () => {
+    deck = [];
     for (let i = 2; i <= 10; i++) {
       for (const type of types) {
         deck.push(i + type);
@@ -38,12 +60,8 @@
     }
 
     // Using underscore.js
-    deck = _.shuffle(deck);
-
-    return deck;
+    return _.shuffle(deck);
   };
-
-  createDeck();
 
   // This functions allow the player to pick a card
   const askForCard = () => {
@@ -52,9 +70,7 @@
       throw "No hay cartas en el deck";
     }
 
-    const card = deck.pop();
-
-    return card;
+    return deck.pop();
   };
 
   // This functions assign value for each card
@@ -63,19 +79,31 @@
     return isNaN(value) ? (value === "A" ? 11 : 10) : value * 1;
   };
 
+  //   Turn: 0 = 1st player, lastone = computer
+  const setScore = (card, turn) => {
+    playersScore[turn] = playersScore[turn] + cardValue(card);
+    smallsHTML[turn].innerText = playersScore[turn];
+    return playersScore[turn];
+  };
+
+  const generateCard = (card, turn) => {
+    const cardImg = document.createElement("img");
+    cardImg.src = `assets/cartas/${card}.png`;
+    cardImg.classList.add("carta");
+
+    divPlayersCards[turn].append(cardImg);
+  };
+
   // Computer
   const computerTurn = (minScore) => {
+    let scoreComputer = 0;
     do {
       const card = askForCard();
 
-      scoreComputer = scoreComputer + cardValue(card);
-      smallsHTML[1].innerText = scoreComputer;
+      scoreComputer = setScore(card, playersScore.length - 1);
 
       // Generate card image
-      const cardImg = document.createElement("img");
-      cardImg.src = `assets/cartas/${card}.png`;
-      cardImg.classList.add("carta");
-      divComputerCards.append(cardImg);
+      generateCard(card, playersScore.length - 1);
 
       // player one lost, so don't care what card computer get
       if (minScore > 21) {
@@ -83,36 +111,33 @@
       }
     } while (scoreComputer < minScore && minScore <= 21);
 
-    setTimeout(() => {
-      showWinner();
-    }, 1000);
+    showWinner();
   };
 
   const showWinner = () => {
-    if (
-      scorePlayer1 <= 21 &&
-      (scoreComputer < scorePlayer1 || scoreComputer > 21)
-    ) {
-      alert("You win!!");
-    } else if (scorePlayer1 === scoreComputer) {
-      alert("No body wins");
-    } else {
-      alert("You lost :(");
-    }
+    setTimeout(() => {
+      const [scorePlayer1, scoreComputer] = playersScore;
+
+      if (
+        scorePlayer1 <= 21 &&
+        (scoreComputer < scorePlayer1 || scoreComputer > 21)
+      ) {
+        alert("You win!!");
+      } else if (scorePlayer1 === scoreComputer) {
+        alert("No body wins");
+      } else {
+        alert("You lost :(");
+      }
+    }, 1000);
   };
 
   // Events
   btnGet.addEventListener("click", () => {
     const card = askForCard();
-
-    scorePlayer1 = scorePlayer1 + cardValue(card);
-    smallsHTML[0].innerText = scorePlayer1;
+    let scorePlayer1 = setScore(card, 0);
 
     // Generate card image
-    const cardImg = document.createElement("img");
-    cardImg.src = `assets/cartas/${card}.png`;
-    cardImg.classList.add("carta");
-    divPlayerCards.append(cardImg);
+    generateCard(card, 0);
 
     if (scorePlayer1 > 21) {
       console.warn("Perdise, papu :(!");
@@ -131,23 +156,15 @@
     btnGet.disabled = true;
     btnStop.disabled = true;
 
-    computerTurn(scorePlayer1);
+    computerTurn(playersScore[0]);
   });
 
   btnNew.addEventListener("click", () => {
-    deck = [];
-    deck = createDeck();
-
-    btnGet.disabled = false;
-    btnStop.disabled = false;
-
-    scorePlayer1 = 0;
-    scoreComputer = 0;
-
-    smallsHTML[0].innerText = 0;
-    smallsHTML[1].innerText = 0;
-
-    divPlayerCards.innerHTML = "";
-    divComputerCards.innerHTML = "";
+    startGame();
   });
+
+
+  return {
+    newGame: startGame
+  }
 })();
